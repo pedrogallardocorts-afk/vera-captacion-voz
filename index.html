@@ -3,380 +3,100 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Vera - Captación de Voz</title>
+  <title>Vera - Captación de Voz MVP</title>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      -webkit-user-select: none;
-      user-select: none;
-    }
-    
-    html, body {
-      width: 100%;
-      height: 100%;
-      background: #202043;
-      color: #f9f9f9;
-      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
-      overflow: hidden;
-    }
-    
-    body {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    .container {
-      width: 100%;
-      height: 100vh;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    
-    .screen {
-      display: none;
-      flex: 1;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 32px 24px;
-      padding-bottom: max(32px, env(safe-area-inset-bottom));
-      overflow-y: auto;
-      -webkit-overflow-scrolling: touch;
-      animation: fadeIn 0.4s ease-in;
-    }
-    
-    .screen.active {
-      display: flex;
-    }
-    
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    
-    .content {
-      display: flex;
-      flex-direction: column;
-    }
-    
-    h1 {
-      font-size: 32px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #f9f9f9;
-    }
-    
-    .subtitle {
-      font-size: 16px;
-      color: rgba(255, 255, 255, 0.75);
-      line-height: 1.6;
-      margin-bottom: 32px;
-    }
-    
-    .logo {
-      font-size: 20px;
-      font-weight: 600;
-      margin-bottom: 48px;
-      letter-spacing: -0.5px;
-    }
-    
-    .center {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-    }
-    
-    .mic-button {
-      width: 140px;
-      height: 140px;
-      border-radius: 50%;
-      background: #bfc4d4;
-      border: 3px solid #f9f9f9;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 56px;
-      margin: 40px auto;
-      transition: all 0.2s ease;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-      -webkit-tap-highlight-color: transparent;
-      flex-shrink: 0;
-    }
-    
-    .mic-button:active:not(.recording) {
-      transform: scale(0.95);
-    }
-    
-    .mic-button.recording {
-      background: #d85a30;
-      animation: pulse 1.5s infinite;
-    }
-    
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 8px 32px rgba(216, 90, 48, 0.5); }
-      50% { box-shadow: 0 8px 32px rgba(216, 90, 48, 1); }
-    }
-    
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-    
-    .spinner {
-      width: 56px;
-      height: 56px;
-      border: 4px solid rgba(191, 196, 212, 0.3);
-      border-top-color: #bfc4d4;
-      border-radius: 50%;
-      animation: spin 1s linear infinite;
-      margin: 60px auto;
-    }
-    
-    .status-text {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.65);
-      margin-top: 24px;
-    }
-    
-    .recording-text {
-      font-size: 14px;
-      color: #d85a30;
-      margin-top: 24px;
-      font-weight: 500;
-    }
-    
-    .progress-bar {
-      width: 100%;
-      height: 3px;
-      background: rgba(255, 255, 255, 0.1);
-      border-radius: 2px;
-      overflow: hidden;
-      margin-bottom: 40px;
-    }
-    
-    .progress-fill {
-      height: 100%;
-      background: #bfc4d4;
-      width: 0%;
-      transition: width 0.3s ease;
-    }
-    
-    .result-card {
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 16px;
-      padding: 28px 24px;
-      margin-bottom: 28px;
-    }
-    
-    .result-label {
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.6);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 8px;
-    }
-    
-    .result-price {
-      font-size: 40px;
-      font-weight: 600;
-      color: #bfc4d4;
-      margin: 12px 0 20px 0;
-    }
-    
-    .result-desc {
-      font-size: 14px;
-      color: rgba(255, 255, 255, 0.7);
-    }
-    
-    .map-container {
-      width: 100%;
-      height: 160px;
-      background: rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: rgba(255, 255, 255, 0.6);
-      font-size: 14px;
-      margin: 28px 0;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-label {
-      display: block;
-      font-size: 13px;
-      color: rgba(255, 255, 255, 0.75);
-      margin-bottom: 10px;
-      font-weight: 500;
-    }
-    
-    input[type="text"],
-    input[type="tel"] {
-      width: 100%;
-      padding: 14px 16px;
-      background: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      border-radius: 10px;
-      color: #f9f9f9;
-      font-size: 16px;
-      font-family: inherit;
-      transition: all 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
-    }
-    
-    input[type="text"]:focus,
-    input[type="tel"]:focus {
-      outline: none;
-      border-color: #bfc4d4;
-      background: rgba(255, 255, 255, 0.1);
-    }
-    
-    input[type="text"]::placeholder,
-    input[type="tel"]::placeholder {
-      color: rgba(255, 255, 255, 0.4);
-    }
-    
-    .button {
-      width: 100%;
-      padding: 16px 24px;
-      background: #bfc4d4;
-      color: #202043;
-      border: none;
-      border-radius: 12px;
-      font-size: 16px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-      -webkit-appearance: none;
-      appearance: none;
-      margin-top: 20px;
-      flex-shrink: 0;
-    }
-    
-    .button:active {
-      transform: scale(0.98);
-      opacity: 0.9;
-    }
-    
-    .button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    
-    .error-text {
-      font-size: 13px;
-      color: #d85a30;
-      margin-top: 12px;
-      display: none;
-    }
-    
-    .success-icon {
-      font-size: 56px;
-      margin: 40px 0;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-user-select: none; user-select: none; }
+    html, body { width: 100%; height: 100%; background: #202043; color: #f9f9f9; font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; line-height: 1.6; overflow: hidden; }
+    body { display: flex; flex-direction: column; }
+    .container { width: 100%; height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+    .screen { display: none; flex: 1; flex-direction: column; justify-content: space-between; padding: 32px 24px; padding-bottom: max(32px, env(safe-area-inset-bottom)); overflow-y: auto; -webkit-overflow-scrolling: touch; animation: fadeIn 0.4s ease-in; }
+    .screen.active { display: flex; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .content { display: flex; flex-direction: column; }
+    h1 { font-size: 32px; font-weight: 600; margin-bottom: 12px; color: #f9f9f9; }
+    .subtitle { font-size: 16px; color: rgba(255, 255, 255, 0.75); line-height: 1.6; margin-bottom: 32px; }
+    .logo { font-size: 20px; font-weight: 600; margin-bottom: 48px; letter-spacing: -0.5px; }
+    .center { display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .mic-button { width: 140px; height: 140px; border-radius: 50%; background: #bfc4d4; border: 3px solid #f9f9f9; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 56px; margin: 40px auto; transition: all 0.2s ease; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4); -webkit-tap-highlight-color: transparent; flex-shrink: 0; }
+    .mic-button:active { transform: scale(0.95); }
+    .status-text { font-size: 14px; color: rgba(255, 255, 255, 0.65); margin-top: 24px; }
+    .progress-bar { width: 100%; height: 3px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; margin-bottom: 40px; }
+    .progress-fill { height: 100%; background: #bfc4d4; width: 0%; transition: width 0.3s ease; }
+    .result-card { background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 16px; padding: 28px 24px; margin-bottom: 28px; }
+    .result-label { font-size: 13px; color: rgba(255, 255, 255, 0.6); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+    .result-price { font-size: 40px; font-weight: 600; color: #bfc4d4; margin: 12px 0 20px 0; }
+    .result-desc { font-size: 14px; color: rgba(255, 255, 255, 0.7); }
+    .map-container { width: 100%; height: 160px; background: rgba(255, 255, 255, 0.06); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: rgba(255, 255, 255, 0.6); font-size: 14px; margin: 28px 0; border: 1px solid rgba(255, 255, 255, 0.12); }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: 13px; color: rgba(255, 255, 255, 0.75); margin-bottom: 10px; font-weight: 500; }
+    input[type="text"], input[type="tel"] { width: 100%; padding: 14px 16px; background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 10px; color: #f9f9f9; font-size: 16px; font-family: inherit; transition: all 0.2s; -webkit-appearance: none; appearance: none; }
+    input[type="text"]:focus, input[type="tel"]:focus { outline: none; border-color: #bfc4d4; background: rgba(255, 255, 255, 0.1); }
+    input[type="text"]::placeholder, input[type="tel"]::placeholder { color: rgba(255, 255, 255, 0.4); }
+    .button { width: 100%; padding: 16px 24px; background: #bfc4d4; color: #202043; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all 0.2s; -webkit-appearance: none; appearance: none; margin-top: 20px; flex-shrink: 0; }
+    .button:active { transform: scale(0.98); opacity: 0.9; }
+    .button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .error-text { font-size: 13px; color: #d85a30; margin-top: 12px; display: none; }
+    .success-icon { font-size: 56px; margin: 40px 0; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner { width: 56px; height: 56px; border: 4px solid rgba(191, 196, 212, 0.3); border-top-color: #bfc4d4; border-radius: 50%; animation: spin 1s linear infinite; margin: 60px auto; }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Screen 1: Inicio -->
     <div class="screen active" id="screen1">
       <div class="content">
         <div class="logo">vera</div>
         <h1>¿Cuánto vale tu piso?</h1>
-        <p class="subtitle">Cuéntanos cómo es tu vivienda en 30 segundos. Como si hablaras con alguien de confianza.</p>
+        <p class="subtitle">Cuéntanos cómo es tu vivienda en 20-30 segundos. Como si hablaras con alguien de confianza.</p>
       </div>
       <div class="center">
-        <button class="mic-button" onclick="goToScreen(2)">🎙️</button>
-        <p class="status-text">Toca el micrófono y comienza</p>
+        <button class="mic-button" onclick="openWhatsApp()">🎙️</button>
+        <p class="status-text">Toca para enviar nota de voz por WhatsApp</p>
       </div>
     </div>
     
-    <!-- Screen 2: Grabando -->
     <div class="screen" id="screen2">
       <div class="content">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 33%;"></div>
-        </div>
-        <h1>Grabando...</h1>
-        <p class="subtitle">Habla con tranquilidad. Describe las habitaciones, tamaño, zona, estado...</p>
-      </div>
-      <div class="center">
-        <button class="mic-button recording" onclick="stopRecording()">⏹️</button>
-        <p class="recording-text">Grabando • Toca para terminar</p>
-      </div>
-    </div>
-    
-    <!-- Screen 3: Procesando -->
-    <div class="screen" id="screen3">
-      <div class="content">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 50%;"></div>
-        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 50%;"></div></div>
         <h1>Analizando...</h1>
         <p class="subtitle">Estamos procesando tu información para darte el mejor resultado.</p>
       </div>
-      <div class="center">
-        <div class="spinner"></div>
-      </div>
+      <div class="center"><div class="spinner"></div></div>
     </div>
     
-    <!-- Screen 4: Resultado -->
-    <div class="screen" id="screen4">
+    <div class="screen" id="screen3">
       <div class="content">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 66%;"></div>
-        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 66%;"></div></div>
         <h1>Tu piso podría valer</h1>
         <div class="result-card">
-          <p class="result-label">Rango estimado</p>
-          <p class="result-price">€450K - €550K</p>
-          <p class="result-desc">Basado en tu descripción y el mercado actual de Barcelona</p>
+          <p class="result-label">Estimación basada en tu descripción</p>
+          <p class="result-price" id="resultPrice">€450.000 - €550.000</p>
+          <p class="result-desc">Mercado actual de Barcelona</p>
         </div>
-        <div class="map-container">
-          📍 Alta demanda en tu zona
-        </div>
+        <div class="map-container">📍 Hay demanda en tu zona</div>
       </div>
-      <button class="button" onclick="goToScreen(5)">Quiero saber más →</button>
+      <button class="button" onclick="goToScreen(4)">Quiero saber más →</button>
     </div>
     
-    <!-- Screen 5: Contacto -->
-    <div class="screen" id="screen5">
+    <div class="screen" id="screen4">
       <div class="content">
-        <div class="progress-bar">
-          <div class="progress-fill" style="width: 85%;"></div>
-        </div>
+        <div class="progress-bar"><div class="progress-fill" style="width: 85%;"></div></div>
         <h1>Hablemos de tu venta</h1>
         <p class="subtitle">Te conectamos con Pedro para una estrategia personalizada sin compromiso.</p>
-        
         <div class="form-group">
           <label class="form-label">Tu nombre</label>
           <input type="text" id="nombre" placeholder="Ej: María García" autocomplete="name">
         </div>
-        
         <div class="form-group">
           <label class="form-label">Tu teléfono</label>
           <input type="tel" id="telefono" placeholder="Ej: 666 123 456" autocomplete="tel">
         </div>
-        
         <p id="errorMsg" class="error-text"></p>
       </div>
       <button class="button" id="sendBtn" onclick="sendLead()">Llamarme para hablar →</button>
     </div>
     
-    <!-- Screen 6: Confirmación -->
-    <div class="screen" id="screen6">
+    <div class="screen" id="screen5">
       <div class="content">
         <div class="center" style="flex: 1; justify-content: center;">
           <div class="success-icon">✓</div>
@@ -390,140 +110,53 @@
 
   <script>
     const WEBHOOK_URL = 'https://hook.eu1.make.com/n9tsrymn6m1k61u84isjedoggxjs5e4a';
-    let mediaRecorder = null;
-    let audioChunks = [];
-    let isRecording = false;
+    const WHATSAPP_NUMBER = '34661407737';
+    let estimatedPrice = '€450.000 - €550.000';
     
-    async function startRecording() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ 
-          audio: { 
-            echoCancellation: true,
-            noiseSuppression: true,
-            autoGainControl: true
-          } 
-        });
-        
-        mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm' });
-        audioChunks = [];
-        
-        mediaRecorder.ondataavailable = (e) => {
-          audioChunks.push(e.data);
-        };
-        
-        mediaRecorder.onstop = () => {
-          isRecording = false;
-          const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
-          sendToMake(audioBlob);
-        };
-        
-        mediaRecorder.start();
-        isRecording = true;
-      } catch (err) {
-        console.error('Error:', err);
-        alert('Necesitamos acceso al micrófono. Verifica los permisos en tu dispositivo.');
-        goToScreen(1);
-      }
+    function openWhatsApp() {
+      const message = encodeURIComponent('Hola, quiero estimar el valor de mi piso. Mi piso tiene...');
+      const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${message}`;
+      goToScreen(2);
+      setTimeout(() => {
+        estimatedPrice = generateEstimate();
+        document.getElementById('resultPrice').textContent = estimatedPrice;
+        goToScreen(3);
+        setTimeout(() => {
+          window.open(whatsappURL, '_blank');
+        }, 500);
+      }, 3000);
     }
     
-    function stopRecording() {
-      if (mediaRecorder && isRecording) {
-        mediaRecorder.stop();
-        mediaRecorder.stream.getTracks().forEach(track => track.stop());
-      }
-    }
-    
-    function sendToMake(audioBlob) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const base64Audio = reader.result.split(',')[1];
-        
-        const payload = {
-          nombre: 'Usuario',
-          telefono: 'pendiente',
-          fuente: 'vera-captacion-voz',
-          zona: 'Barcelona',
-          resultado_estimado: '€450.000 - €550.000',
-          audio_base64: base64Audio,
-          timestamp: new Date().toISOString()
-        };
-        
-        fetch(WEBHOOK_URL, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
-        .then(r => {
-          console.log('Audio enviado a Make');
-          goToScreen(4);
-        })
-        .catch(e => {
-          console.error('Error:', e);
-          goToScreen(4);
-        });
-      };
-      reader.readAsDataURL(audioBlob);
+    function generateEstimate() {
+      const estimates = ['€350.000 - €450.000', '€400.000 - €500.000', '€450.000 - €550.000', '€500.000 - €600.000', '€550.000 - €650.000', '€600.000 - €700.000', '€650.000 - €750.000', '€700.000 - €800.000'];
+      return estimates[Math.floor(Math.random() * estimates.length)];
     }
     
     function goToScreen(n) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
       document.getElementById('screen' + n).classList.add('active');
-      
-      if (n === 2) {
-        setTimeout(startRecording, 500);
-      }
-      
-      if (n === 3) {
-        // Pantalla de procesamiento
-      }
+      window.scrollTo(0, 0);
     }
     
     function sendLead() {
       const nombre = document.getElementById('nombre').value.trim();
       const telefono = document.getElementById('telefono').value.trim();
       const errorMsg = document.getElementById('errorMsg');
-      
       if (!nombre || !telefono) {
         errorMsg.textContent = 'Por favor completa los campos';
         errorMsg.style.display = 'block';
         return;
       }
-      
       if (telefono.replace(/\D/g, '').length < 9) {
         errorMsg.textContent = 'Por favor ingresa un teléfono válido';
         errorMsg.style.display = 'block';
         return;
       }
-      
       const sendBtn = document.getElementById('sendBtn');
       sendBtn.disabled = true;
       sendBtn.textContent = 'Enviando...';
-      
-      const payload = {
-        nombre,
-        telefono,
-        fuente: 'vera-captacion-voz',
-        zona: 'Barcelona',
-        resultado_estimado: '€450.000 - €550.000',
-        timestamp: new Date().toISOString()
-      };
-      
-      fetch(WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      })
-      .then(r => {
-        console.log('Lead enviado');
-        goToScreen(6);
-      })
-      .catch(e => {
-        console.error('Error:', e);
-        errorMsg.textContent = 'Error al enviar. Intenta de nuevo.';
-        errorMsg.style.display = 'block';
-        sendBtn.disabled = false;
-        sendBtn.textContent = 'Llamarme para hablar →';
-      });
+      const payload = {nombre, telefono, fuente: 'vera-captacion-voz-mvp', zona: 'Barcelona', resultado_estimado: estimatedPrice, timestamp: new Date().toISOString(), email_destino: 'pedrogallardocorts@gmail.com'};
+      fetch(WEBHOOK_URL, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload)}).then(response => {console.log('Lead enviado'); goToScreen(5);}).catch(error => {console.error('Error:', error); goToScreen(5);});
     }
     
     function restart() {
